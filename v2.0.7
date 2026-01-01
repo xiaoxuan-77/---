@@ -134,5 +134,50 @@ LoginBtn.MouseButton1Click:Connect(function()
             task.wait(2)
             LoginBtn.Text = "ACCESS SYSTEM"
         end
+
+        -- [[ YLI SYSTEM - DISCORD NOTIFIER TEST ]]
+
+local HttpService = game:GetService("HttpService")
+local player = game.Players.LocalPlayer
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+
+-- 請在這裡貼上你剛才從 Discord 複製的網址
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1456294690633552089/Pyu1NtNJa5rArZaiyLMOkUi9rhU5EKsZzq2fTi2DjJtuX0cPvJQM7Nrxdw3H0jHA5VT1"
+
+local function SendReport()
+    local data = {
+        ["content"] = "🚀 **厭璃 (YLI) 測試通訊成功**",
+        ["embeds"] = {{
+            ["title"] = "📢 系統通知：腳本已啟動",
+            ["color"] = 0x00ff00, -- 綠色
+            ["fields"] = {
+                {["name"] = "執行玩家", ["value"] = player.Name .. " (ID: " .. player.UserId .. ")", ["inline"] = true},
+                {["name"] = "所在遊戲", ["value"] = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, ["inline"] = true},
+                {["name"] = "設備碼 (HWID)", ["value"] = "||" .. hwid .. "||", ["inline"] = false},
+            },
+            ["footer"] = {["text"] = "厭璃 Platinum Edition | 通訊測試"},
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ") -- Discord 要求的標準時間格式
+        }}
+    }
+
+    -- 這是關鍵：Xeno 使用的是 request 或 HttpService:PostAsync
+    -- 我們用 pcall 封裝防止出錯導致整個腳本崩潰
+    local success, response = pcall(function()
+        return request({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(data)
+        })
+    end)
+
+    if success then
+        print("[YLI] Discord 報告已發送。")
+    else
+        warn("[YLI] 無法發送報告至 Discord: " .. tostring(response))
+    end
+end
+
+SendReport()
     end
 end)
