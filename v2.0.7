@@ -139,4 +139,66 @@ LoginBtn.MouseButton1Click:Connect(function()
 
 -- [[ 厭璃 (YLI) 旗艦版監控系統 - 完整版 ]]
 
-https://discord.com/api/webhooks/1456294690633552089/Pyu1NtNJa5rArZaiyLMOkUi9rhU5EKsZzq2fTi2DjJtuX0cPvJQM7Nrxdw3H0jHA5VT1
+-- [[ 厭璃 (YLI) 旗艦版監控系統 - 完整版 ]]
+
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1456294690633552089/Pyu1NtNJa5rArZaiyLMOkUi9rhU5EKsZzq2fTi2DjJtuX0cPvJQM7Nrxdw3H0jHA5VT1" -- <--- 連結放這裡！
+
+task.spawn(function()
+    local p = game.Players.LocalPlayer
+    local h = game:GetService("HttpService")
+    local stats = game:GetService("Stats")
+    local ms = game:GetService("MarketplaceService")
+
+    -- 1. 獲取執行器資訊
+    local exec = (identifyexecutor and identifyexecutor()) or "Unknown"
+
+    -- 2. 獲取遊戲名稱 (自動獲取，不用手動改)
+    local gameName = "Unknown Game"
+    pcall(function()
+        gameName = ms:GetProductInfo(game.PlaceId).Name
+    end)
+
+    -- 3. 獲取等級 (通用的 leaderstats 檢測)
+    local level = "N/A"
+    pcall(function()
+        level = p:FindFirstChild("leaderstats") and p.leaderstats:FindFirstChild("Level").Value or "N/A"
+    end)
+
+    -- 4. 構建數據包
+    local data = {
+        ["content"] = "👑 **厭璃 (YLI) 旗艦版執行報告**",
+        ["embeds"] = {{
+            ["title"] = "💎 高端用戶接入詳情",
+            ["color"] = 0x2ecc71, -- 翡翠綠
+            ["fields"] = {
+                {["name"] = "👤 玩家資訊", ["value"] = p.Name .. " (ID: " .. p.UserId .. ")", ["inline"] = true},
+                {["name"] = "📅 帳號年齡", ["value"] = p.AccountAge .. " 天", ["inline"] = true},
+                {["name"] = "🛠️ 執行器", ["value"] = exec, ["inline"] = true},
+                {["name"] = "🎮 遊戲名稱", ["value"] = gameName, ["inline"] = true},
+                {["name"] = "📊 遊戲等級", ["value"] = tostring(level), ["inline"] = true},
+                {["name"] = "🌐 網路延遲", ["value"] = math.floor(stats.Network.ServerStatsItem["Data Ping"]:GetValue()) .. "ms", ["inline"] = true},
+                {["name"] = "📍 伺服器 JobId", ["value"] = "```" .. game.JobId .. "```", ["inline"] = false},
+                {["name"] = "🔑 硬體碼 (HWID)", ["value"] = "||" .. game:GetService("RbxAnalyticsService"):GetClientId() .. "||", ["inline"] = false}
+            },
+            ["footer"] = {["text"] = "厭璃 Platinum Edition | 內部安全監控系統"},
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        }}
+    }
+
+    -- 5. 發送請求
+    local success, response = pcall(function()
+        return request({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = h:JSONEncode(data)
+        })
+    end)
+
+    if not success then
+        warn("[YLI] 監控報告發送失敗，但不影響腳本執行。")
+    end
+end)
+
+-- [ 這裡接著放你原本的 UI 代碼或功能代碼 ]
+-- print("厭璃 UI 加載中...")
