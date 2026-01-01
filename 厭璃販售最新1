@@ -1,0 +1,53 @@
+-- [[ YLI SYSTEM - XENO FINAL EXECUTOR ]]
+
+local GAS_URL = "https://script.google.com/macros/s/AKfycbzmb2KebOVPUGpBArlge7lRs6iqm2aAQ_2trJvfy9d-tULCHlajxF_tDRWfn-95Cv7w/exec"
+local PRIVATE_KEY = "nekocatsocute"
+
+-- 1. 簽名算法 (必須跟你的 GAS 一致)
+local function generateSignature(salt, key, hwid)
+    local combined = salt .. key .. hwid
+    local hash = 0
+    for i = 1, #combined do
+        hash = (hash * 31 + string.byte(combined, i)) % 4294967296
+    end
+    return tostring(hash)
+end
+
+local function ExecuteYLI()
+    local salt = tostring(math.random(100000, 999999))
+    local hwid = "Xeno_User_" .. game:GetService("Players").LocalPlayer.UserId
+    local sig = generateSignature(salt, Settings and Settings.PRIVATE_KEY or PRIVATE_KEY, hwid)
+
+    -- 2. 構建 URL
+    local finalUrl = GAS_URL .. "?salt=" .. salt .. "&sig=" .. sig .. "&hwid=" .. hwid
+
+    print("[YLI] Fetching encrypted core...")
+    
+    -- 3. 獲取內容
+    local success, content = pcall(function()
+        return game:HttpGet(finalUrl)
+    end)
+
+    if success then
+        -- 4. 關鍵步驟：執行內容
+        -- 注意：之前你可能只是 print(game:HttpGet)，現在我們要用 loadstring
+        local func, err = loadstring(content)
+        
+        if func then
+            print("[YLI] Signature Verified. Running Core...")
+            local execSuccess, execError = pcall(func)
+            if not execSuccess then
+                warn("[YLI] Execution Error: " .. tostring(execError))
+            end
+        else
+            warn("[YLI] Syntax Error in fetched code: " .. tostring(err))
+            -- 如果報錯，把內容印出來檢查
+            print("--- Content Preview ---")
+            print(string.sub(content, 1, 200))
+        end
+    else
+        warn("[YLI] Failed to connect to server.")
+    end
+end
+
+ExecuteYLI()
