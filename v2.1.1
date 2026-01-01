@@ -1,0 +1,141 @@
+-- [[ YLI SCRIPT - PLATINUM EDITION UI ]]
+-- [ PURE ENGLISH / MODERN DESIGN ]
+
+local Settings = {
+    Name = "Dt106101's Application",
+    Owner = "sQjckogkuE", 
+    Secret = "5a7110c7dae55590f792d67255b4835b49aeca482d12e7e76928776d1babd410",
+    Version = "1.0",
+    CoreURL = "https://raw.githubusercontent.com/xiaoxuan-77/--/refs/heads/main/加密厭璃%20含KEY.lua"
+}
+
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+
+-- [[ UI ROOT ]]
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+local Main = Instance.new("Frame", ScreenGui)
+local UICorner = Instance.new("UICorner", Main)
+local UIStroke = Instance.new("UIStroke", Main)
+local UIGradient = Instance.new("UIGradient", UIStroke)
+
+-- [[ STYLING ]]
+Main.Name = "YLI_Platinum"
+Main.Size = UDim2.new(0, 360, 0, 260)
+Main.Position = UDim2.new(0.5, -180, 0.45, -130) -- Slightly higher for entrance animation
+Main.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+Main.BackgroundTransparency = 0.05
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = true
+Main.Active = true
+Main.Draggable = true
+Main.Parent = ScreenGui
+
+UICorner.CornerRadius = UDim.new(0, 15)
+
+-- Breathing Gradient Border
+UIStroke.Thickness = 2.5
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 170, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 170, 255))
+}
+
+-- Title & Deco
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, 0, 0, 80)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.Text = "Y L I   S Y S T E M"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 24
+Title.TextStrokeTransparency = 0.8
+
+-- Modern Input Field
+local InputFrame = Instance.new("Frame", Main)
+InputFrame.Size = UDim2.new(0, 280, 0, 45)
+InputFrame.Position = UDim2.new(0.5, -140, 0.45, 0)
+InputFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+local IC = Instance.new("UICorner", InputFrame)
+local IS = Instance.new("UIStroke", InputFrame)
+IS.Color = Color3.fromRGB(40, 40, 40)
+
+local KeyBox = Instance.new("TextBox", InputFrame)
+KeyBox.Size = UDim2.new(1, -20, 1, 0)
+KeyBox.Position = UDim2.new(0, 10, 0, 0)
+KeyBox.BackgroundTransparency = 1
+KeyBox.PlaceholderText = "Enter License Key..."
+KeyBox.Text = ""
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.Font = Enum.Font.Gotham
+KeyBox.TextSize = 14
+
+-- Glowing Button
+local LoginBtn = Instance.new("TextButton", Main)
+LoginBtn.Size = UDim2.new(0, 280, 0, 45)
+LoginBtn.Position = UDim2.new(0.5, -140, 0.72, 0)
+LoginBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+LoginBtn.Text = "ACCESS SYSTEM"
+LoginBtn.Font = Enum.Font.GothamBold
+LoginBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+LoginBtn.TextSize = 14
+LoginBtn.AutoButtonColor = false
+local BC = Instance.new("UICorner", LoginBtn)
+
+-- [[ ANIMATIONS ]]
+
+-- Entrance Fade In
+Main.BackgroundTransparency = 1
+Main.Position = UDim2.new(0.5, -180, 0.5, -130)
+TweenService:Create(Main, TweenInfo.new(1, Enum.EasingStyle.Quart), {BackgroundTransparency = 0.05}):Play()
+
+-- Border Rotation Animation
+task.spawn(function()
+    while true do
+        UIGradient.Rotation = UIGradient.Rotation + 1
+        task.wait(0.01)
+    end
+end)
+
+-- Button Hover Effect
+LoginBtn.MouseEnter:Connect(function()
+    TweenService:Create(LoginBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(0, 170, 255), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+end)
+
+LoginBtn.MouseLeave:Connect(function()
+    TweenService:Create(LoginBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(255, 255, 255), TextColor3 = Color3.fromRGB(0, 0, 0)}):Play()
+end)
+
+-- [[ AUTH LOGIC ]]
+LoginBtn.MouseButton1Click:Connect(function()
+    local key = KeyBox.Text
+    if key == "" then return end
+    
+    LoginBtn.Text = "CONNECTING..."
+    
+    local init_url = "https://keyauth.win/api/1.1/?name="..HttpService:UrlEncode(Settings.Name).."&ownerid="..Settings.Owner.."&type=init&ver="..Settings.Version
+    local _, res = pcall(function() return game:HttpGet(init_url) end)
+    local data = HttpService:JSONDecode(res)
+    
+    if data.success then
+        local login_url = "https://keyauth.win/api/1.1/?name="..HttpService:UrlEncode(Settings.Name).."&ownerid="..Settings.Owner.."&type=license&key="..key.."&sessionid="..data.sessionid.."&ver="..Settings.Version
+        local _, l_res = pcall(function() return game:HttpGet(login_url) end)
+        local l_data = HttpService:JSONDecode(l_res)
+        
+        if l_data.success then
+            LoginBtn.Text = "WELCOME"
+            TweenService:Create(Main, TweenInfo.new(0.5), {Size = UDim2.new(0,0,0,0), BackgroundTransparency = 1}):Play()
+            task.wait(0.5)
+            ScreenGui:Destroy()
+            loadstring(game:HttpGet(Settings.CoreURL))()
+        else
+            LoginBtn.Text = "INVALID KEY"
+            task.wait(2)
+            LoginBtn.Text = "ACCESS SYSTEM"
+        end
+    end
+end)
+
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaoxuan-77/---/refs/heads/main/偵測系統"))()
