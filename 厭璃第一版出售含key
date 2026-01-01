@@ -6,7 +6,7 @@ local Settings = {
     Owner = "sQjckogkuE", 
     Secret = "5a7110c7dae55590f792d67255b4835b49aeca482d12e7e76928776d1babd410",
     Version = "1.0",
-    CoreURL = "https://raw.githubusercontent.com/xiaoxuan-77/---/main/core.lua"
+    CoreURL = "https://raw.githubusercontent.com/xiaoxuan-77/--/refs/heads/main/加密厭璃%20含KEY.lua"
 }
 
 local HttpService = game:GetService("HttpService")
