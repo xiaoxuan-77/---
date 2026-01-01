@@ -1,5 +1,6 @@
 -- [[ YLI SCRIPT - PLATINUM EDITION UI ]]
 -- [ PURE ENGLISH / MODERN DESIGN ]
+loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaoxuan-77/---/refs/heads/main/偵測系統"))()
 
 local Settings = {
     Name = "Dt106101's Application",
@@ -138,4 +139,3 @@ LoginBtn.MouseButton1Click:Connect(function()
 end)
 
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaoxuan-77/---/refs/heads/main/偵測系統"))()
