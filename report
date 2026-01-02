@@ -1,0 +1,41 @@
+-- [[ Roblox 實戰 Loader ]]
+local GAS_URL = "https://script.google.com/macros/s/AKfycbzeKve9xQtYoRlVlrKFJxo9upmiXiNJRxFXjqjY4upaYxSVj1EgTX3EbibZ_TQ991ZQVQ/exec" -- 剛才那個結尾是 /exec 的網址
+local PRIVATE_KEY = "nekocatsocute" -- 密碼
+
+-- 1. 獲取真實 HWID
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+local salt = tostring(os.time())
+
+-- 2. 核心加密函數 (把剛才測試成功的搬過來)
+local function generate_payload(id, s)
+    local seed = (tonumber(s) or 0) + #PRIVATE_KEY
+    math.randomseed(seed)
+    local sbox = {}
+    for i = 0, 255 do sbox[i] = i end
+    for i = 255, 1, -1 do
+        local j = math.random(0, i)
+        sbox[i], sbox[j] = sbox[j], sbox[i]
+    end
+    local res = ""
+    for i = 1, #id do
+        res = res .. string.format("%02x", sbox[id:byte(i)])
+    end
+    return res
+end
+
+-- 3. 組裝網址並發送請求
+local payload = generate_payload(hwid, salt)
+local final_url = GAS_URL .. "?s=" .. salt .. "&data=" .. payload
+
+print("正在通過混沌隧道建立連線...")
+
+local success, content = pcall(function()
+    return game:HttpGet(final_url)
+end)
+
+if success and not content:find("非法請求") and not content:find("錯誤") then
+    print("解密成功！啟動腳本...")
+    loadstring(content)()
+else
+    warn("連線失敗：暗號錯誤或伺服器拒絕存取。")
+end
