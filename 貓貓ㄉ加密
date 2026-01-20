@@ -1,0 +1,53 @@
+-- [[ YLI SYSTEM - GAS 請求模組 ]]
+
+local HttpService = game:GetService("HttpService")
+
+-- 1. 設定區
+local GAS_URL = "https://script.google.com/macros/s/AKfycby6gZO5OVEkssabsxikcBs7h17g8BIOEInZDJYeSjlcNTd-xsviLprzqcODle63IcwY/exec"
+local PRIVATE_KEY = "POTATO" -- 必須跟 GAS 一模一樣
+
+-- 2. 驗證數據生成函數 (對應 GAS 的 SecurityLib)
+-- 註：這裡模擬最常見的簡單校驗邏輯
+local function generateSecurityData(key)
+    local salt = tostring(math.random(100000, 999999))
+    -- 這裡假設 SecurityLib 是比對 data 是否包含 key 與 salt 的某種關聯
+    -- 如果你的 SecurityLib 有特定算法（如 HMAC-SHA256），則需另外調整
+    local data = "AUTH_" .. salt .. "_" .. key 
+    return data, salt
+end
+
+-- 3. 執行請求
+local function fetchProtectedScript()
+    print("正在通過 GAS 門衛驗證...")
+    
+    local auth_data, auth_salt = generateSecurityData(PRIVATE_KEY)
+    
+    -- 構建完整網址
+    local final_url = GAS_URL .. "?data=" .. HttpService:UrlEncode(auth_data) .. "&s=" .. auth_salt
+    
+    local success, content = pcall(function()
+        return game:HttpGet(final_url)
+    end)
+    
+    if success then
+        if content:find("974:") then
+            warn("驗證失敗：GAS 拒絕存取（密鑰不匹配）")
+        elseif content:find("錯誤:") then
+            warn("GAS 內部錯誤：" .. content)
+        else
+            print("✅ 驗證成功，正在載入腳本...")
+            -- 執行抓回來的內容 (回報系統或貓)
+            local func, err = loadstring(content)
+            if func then
+                func()
+            else
+                warn("腳本解析失敗: " .. tostring(err))
+            end
+        end
+    else
+        warn("網路請求失敗，請檢查 GAS 網址是否正確。")
+    end
+end
+
+-- 啟動
+fetchProtectedScript()
