@@ -4,7 +4,7 @@ local TeleportService = game:GetService("TeleportService")
 
 -- 定義你的 GitHub 連結 (請自行替換)
 local Mobile_Script_URL = "https://pastebin.com/raw/47b5Ge1e"
-local PC_Script_URL     = "https://github.com/dt106101-ai/asdddd/blob/main/obfuscator.lua"
+local PC_Script_URL     = "https://raw.githubusercontent.com/dt106101-ai/asdddd/refs/heads/main/obfuscator.lua"
 
 local function ExecuteHardwareSpecificScript()
     -- 偵測邏輯：判斷是否有觸控螢幕且沒有鍵盤（通常是手機/平板）
